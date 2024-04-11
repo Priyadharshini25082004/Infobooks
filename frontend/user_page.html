@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Library Management - User</title>
+    <style>
+        body {
+            background-image: url('C:\\Users\\Priya dharshini .N\\Desktop\\library-management-system\\frontend\\assets\\user_lib.png');
+            background-size: cover;
+            background-repeat: no-repeat;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        #content {
+            background-color: rgba(255, 255, 255, 0.7);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px auto;
+            max-width: 800px;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        #filters {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        #filters label, #filters input {
+            margin-bottom: 10px;
+            flex: 1;
+        }
+
+        #filterButtons {
+            text-align: right;
+            margin-top: 10px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        #pagination {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        #pagination button {
+            margin: 0 5px;
+            background-color: #ccc;
+        }
+
+        #pagination button.active {
+            background-color: #4CAF50;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div id="content">
+        <h1>Library Management System - User</h1>
+        <form id="filters">
+            <div>
+                <label for="title">Title:</label>
+                <input type="text" id="title" name="title">
+                
+                <label for="author">Author:</label>
+                <input type="text" id="author" name="author">
+                
+                <label for="subject">Subject:</label>
+                <input type="text" id="subject" name="subject">
+            </div>
+            <div>
+                <label for="publishDate">Publish Date:</label>
+                <input type="date" id="publishDate" name="publishDate">
+                
+                <label for="count">Count:</label>
+                <input type="number" id="count" name="count">
+            </div>
+            <div id="filterButtons">
+                <button type="submit">Apply Filters</button>
+                <button type="button" onclick="resetFilters()">Reset Filters</button>
+            </div>
+        </form>
+        
+        <table id="bookTable">
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Author</th>
+                    <th>Subject</th>
+                    <th>Publish Date</th>
+                    <th>Count</th>
+                </tr>
+            </thead>
+            <tbody id="bookTableBody"></tbody>
+        </table>
+        <div id="pagination"></div>
+    </div>
+    
+    <script>
+        var allBooks = [
+            { title: "Complete Guide for Exams", author: "R S Agarwal", subject: "Aptitude", publishDate: "2022-01-01", count: 5 },
+            { title: "Introduction to Programming", author: "John Doe", subject: "Computer Science", publishDate: "2021-12-15", count: 3 },
+            { title: "History of World War II", author: "Jane Smith", subject: "History", publishDate: "2022-02-28", count: 7 },
+            { title: "Introduction to Chemistry", author: "Michael Johnson", subject: "Chemistry", publishDate: "2022-03-15", count: 8 },
+            { title: "English Literature Classics", author: "Emily Davis", subject: "Literature", publishDate: "2022-02-28", count: 4 },
+            { title: "Mathematics Essentials", author: "Robert Green", subject: "Mathematics", publishDate: "2022-04-10", count: 6 },
+            { title: "Programming in Python", author: "Alice White", subject: "Computer Science", publishDate: "2022-03-01", count: 10 },
+            { title: "History of Ancient Civilizations", author: "David Brown", subject: "History", publishDate: "2022-05-20", count: 3 },
+            { title: "The Great Gatsby", author: "F. Scott Fitzgerald", subject: "Classic Fiction", publishDate: "1925-04-10", count: 5 },
+            { title: "To Kill a Mockingbird", author: "Harper Lee", subject: "Classic Fiction", publishDate: "1960-07-11", count: 7 },
+            { title: "Crime and Punishment", author: "Fyodor Dostoevsky", subject: "Classic Fiction", publishDate: "1866-11-11", count: 9 },
+            { title: "1984", author: "George Orwell", subject: "Dystopian Fiction", publishDate: "1949-06-08", count: 6 },
+            { title: "Brave New World", author: "Aldous Huxley", subject: "Dystopian Fiction", publishDate: "1932-05-05", count: 4 },
+            { title: "Pride and Prejudice", author: "Jane Austen", subject: "Romance", publishDate: "1813-01-28", count: 5 },
+            { title: "The Catcher in the Rye", author: "J.D. Salinger", subject: "Coming-of-Age Fiction", publishDate: "1951-07-16", count: 7 },
+            { title: "The Hobbit", author: "J.R.R. Tolkien", subject: "Fantasy", publishDate: "1937-09-21", count: 8 },
+            { title: "Harry Potter and the Philosopher's Stone", author: "J.K. Rowling", subject: "Fantasy", publishDate: "1997-06-26", count: 10 },
+            { title: "The Da Vinci Code", author: "Dan Brown", subject: "Mystery", publishDate: "2003-03-18", count: 6 },
+            { title: "The Hitchhiker's Guide to the Galaxy", author: "Douglas Adams", subject: "Science Fiction", publishDate: "1979-10-12", count: 4 },
+            { title: "Sapiens: A Brief History of Humankind", author: "Yuval Noah Harari", subject: "History", publishDate: "2011-04-20", count: 7 },
+            { title: "The Art of War", author: "Sun Tzu", subject: "Military Strategy", publishDate: "1888-03-03", count: 8 }
+        ];
+
+        var currentPage = 1;
+        var rowsPerPage = 10;
+
+        function resetFilters() {
+            document.getElementById("filters").reset();
+            currentPage = 1;
+            updateBookTable();
+            updatePagination();
+        }
+
+        document.getElementById("filters").addEventListener("submit", function(event) {
+            event.preventDefault();
+            currentPage = 1;
+            updateBookTable();
+            updatePagination();
+        });
+
+        function filterBooks(title, author, subject, publishDate, count) {
+            return allBooks.filter(function(book) {
+                return (title === "" || book.title.toLowerCase().includes(title.toLowerCase())) &&
+                       (author === "" || book.author.toLowerCase().includes(author.toLowerCase())) &&
+                       (subject === "" || book.subject.toLowerCase().includes(subject.toLowerCase())) &&
+                       (publishDate === "" || book.publishDate === publishDate) &&
+                       (count === "" || book.count == count);
+            });
+        }
+
+        function updateBookTable() {
+            var tableBody = document.getElementById("bookTableBody");
+            var startIndex = (currentPage - 1) * rowsPerPage;
+            var endIndex = startIndex + rowsPerPage;
+            var filteredBooks = filterBooks(
+                document.getElementById("title").value,
+                document.getElementById("author").value,
+                document.getElementById("subject").value,
+                document.getElementById("publishDate").value,
+                document.getElementById("count").value
+            );
+            var paginatedBooks = filteredBooks.slice(startIndex, endIndex);
+
+            tableBody.innerHTML = ""; // Clear previous table rows
+            
+            // Populate the table with filtered and paginated books
+            paginatedBooks.forEach(function(book) {
+                var row = tableBody.insertRow();
+                row.innerHTML = "<td>" + book.title + "</td>" +
+                                "<td>" + book.author + "</td>" +
+                                "<td>" + book.subject + "</td>" +
+                                "<td>" + book.publishDate + "</td>" +
+                                "<td>" + book.count + "</td>";
+            });
+
+            updatePagination();
+        }
+
+        function updatePagination() {
+            var totalPages = Math.ceil(
+                filterBooks(
+                    document.getElementById("title").value,
+                    document.getElementById("author").value,
+                    document.getElementById("subject").value,
+                    document.getElementById("publishDate").value,
+                    document.getElementById("count").value
+                ).length / rowsPerPage
+            );
+            var pagination = document.getElementById("pagination");
+            pagination.innerHTML = "";
+
+            for (var i = 1; i <= totalPages; i++) {
+                var button = document.createElement("button");
+                button.textContent = i;
+                if (i === currentPage) {
+                    button.classList.add("active");
+                }
+                button.addEventListener("click", function() {
+                    currentPage = parseInt(this.textContent);
+                    updateBookTable();
+                });
+                pagination.appendChild(button);
+            }
+        }
+
+        updateBookTable();
+    </script>
+</body>
+</html>

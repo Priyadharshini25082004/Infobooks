@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Library Management - Admin</title>
+    <style>
+        body {
+            background-image: url('C:\\Users\\Priya dharshini .N\\Desktop\\library-management-system\\frontend\\assets\\admin_lib.png');
+            background-size: cover;
+            background-repeat: no-repeat;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        #content {
+            background-color: rgba(255, 255, 255, 0.7);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px auto;
+            max-width: 800px;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        #filters {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        #filters label, #filters input {
+            margin-bottom: 10px;
+            flex: 1;
+        }
+
+        #filterButtons {
+            text-align: right;
+            margin-top: 10px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        #pagination {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        #pagination button {
+            margin: 0 5px;
+            background-color: #ccc;
+        }
+
+        #pagination button.active {
+            background-color: #4CAF50;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div id="backgroundOverlay"></div> <!-- Background overlay -->
+    <div id="content">
+        <h1>Library Management System - Admin</h1>
+        <form id="filters">
+            <div>
+                <label for="title">Title:</label>
+                <input type="text" id="title" name="title">
+                
+                <label for="author">Author:</label>
+                <input type="text" id="author" name="author">
+                
+                <label for="subject">Subject:</label>
+                <input type="text" id="subject" name="subject">
+            </div>
+            <div>
+                <label for="publishDate">Publish Date:</label>
+                <input type="date" id="publishDate" name="publishDate">
+                
+                <label for="count">Count:</label>
+                <input type="number" id="count" name="count">
+            </div>
+            <div id="filterButtons">
+                <button type="submit">Apply Filters</button>
+                <button type="button" onclick="resetFilters()">Reset Filters</button>
+                <button type="button" onclick="addBook()">Add Book</button>
+            </div>
+        </form>
+        
+        <table id="bookTable">
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Author</th>
+                    <th>Subject</th>
+                    <th>Publish Date</th>
+                    <th>Count</th>
+                </tr>
+            </thead>
+            <tbody id="bookTableBody">
+                <!-- Book entries will be dynamically inserted here -->
+            </tbody>
+        </table>
+        <div id="pagination"></div>
+    </div>
+    
+    <script>
+        var allBooks = [];
+
+        const ITEMS_PER_PAGE = 10;
+        var currentPage = 1;
+
+        function resetFilters() {
+            document.getElementById("filters").reset();
+            currentPage = 1;
+            updateBookTable();
+        }
+
+        document.getElementById("filters").addEventListener("submit", function(event) {
+            event.preventDefault();
+            currentPage = 1;
+            updateBookTable();
+        });
+
+        async function updateBookTable() {
+            var tableBody = document.getElementById("bookTableBody");
+            tableBody.innerHTML = ""; // Clear previous table rows
+
+            try {
+                const response = await fetch('http://localhost:5500/books');
+                const books = await response.json();
+
+                allBooks = books; // Update allBooks array with fetched books data
+
+                // Calculate pagination
+                var startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+                var endIndex = startIndex + ITEMS_PER_PAGE;
+                var paginatedBooks = allBooks.slice(startIndex, endIndex);
+
+                // Populate the table with paginated books
+                paginatedBooks.forEach(function(book) {
+                    var row = tableBody.insertRow();
+                    row.innerHTML = "<td>" + book.Title + "</td>" +
+                                    "<td>" + book.Author + "</td>" +
+                                    "<td>" + book.Subject + "</td>" +
+                                    "<td>" + book.Publish_Date + "</td>" +
+                                    "<td>" + book.Count + "</td>";
+                });
+
+                // Render pagination
+                renderPagination(allBooks.length);
+            } catch (error) {
+                console.error('Error fetching books:', error.message);
+                // Handle errors, show error message to the user, etc.
+            }
+        }
+
+        function renderPagination(totalItems) {
+            var totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE);
+            var paginationDiv = document.getElementById("pagination");
+            paginationDiv.innerHTML = "";
+
+            for (var i = 1; i <= totalPages; i++) {
+                var pageButton = document.createElement("button");
+                pageButton.textContent = i;
+                pageButton.addEventListener("click", function() {
+                    currentPage = parseInt(this.textContent);
+                    updateBookTable();
+                });
+                paginationDiv.appendChild(pageButton);
+            }
+        }
+
+        async function addBook() {
+            try {
+                const bookData = {
+                    title: document.getElementById("title").value,
+                    author: document.getElementById("author").value,
+                    subject: document.getElementById("subject").value,
+                    publishDate: document.getElementById("publishDate").value,
+                    count: parseInt(document.getElementById("count").value)
+                };
+
+                const response = await fetch('http://localhost:5500/add-book', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(bookData)
+                });
+
+                if (!response.ok) {
+                    const errorMessage = await response.text();
+                    throw new Error(errorMessage);
+                }
+
+                const result = await response.json();
+                console.log(result.message); // Book added successfully
+                // You can perform further actions here, like showing a success message to the user
+
+                updateBookTable(); // Update the book table after adding the book
+            } catch (error) {
+                console.error('Error adding book:', error.message);
+                // Handle errors, show error message to the user, etc.
+            }
+        }
+
+        // Initial table rendering
+        updateBookTable();
+    </script>
+</body>
+</html>

@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Login Form</title>
+    <link rel="stylesheet" type="text/css" href="css/style.css">
+    <style>
+        body {
+            background-image: url('C:\\Users\\Priya dharshini .N\\Desktop\\library-management-system\\frontend\\assets\\lib_login.png'); /* Absolute path to the image file */
+            background-size: cover; /* Adjusts the background image size */
+            background-repeat: no-repeat; /* Prevents the background image from repeating */
+            background-position: center; /* Centers the background image */
+        }
+    </style>
+</head>
+<body>
+    <h2>Login Page</h2><br>
+    <div class="login">
+        <form id="login" method="get" action="#">
+            <label><b>User Name</b></label>
+            <input type="text" name="Uname" id="Uname" placeholder="Username">
+            <br><br>
+            <label><b>Password</b></label>
+            <input type="password" name="Pass" id="Pass" placeholder="Password">
+            <br><br>
+            <input type="button" name="log" id="log" value="Log In Here">
+            <br><br>
+            <input type="checkbox" id="check">
+            <span>Remember me</span>
+            <br><br>
+            Forgot <a href="#">Password</a>
+        </form>
+    </div>
+
+    <script>
+        document.getElementById("log").addEventListener("click", function() {
+            var username = document.getElementById("Uname").value;
+            var password = document.getElementById("Pass").value;
+            
+            if (username === 'admin' && password === '12345') {
+                window.location.href = "C:\\Users\\Priya dharshini .N\\Desktop\\library-management-system\\frontend\\admin_page.html";
+            } else {
+                window.location.href = "C:\\Users\\Priya dharshini .N\\Desktop\\library-management-system\\frontend\\user_page.html";
+            }
+        });
+    </script>
+
+    <style>
+        body
+        /*{
+            margin: 0;
+            padding: 0;
+            background-color:#d1c197;
+            font-family: 'Arial';
+        }*/
+        .login{
+            width: 382px;
+            overflow: hidden;
+            margin: auto;
+            margin: 20 0 0 450px;
+            padding: 80px;
+            background: #d1c197;
+            border-radius: 15px ;
+        }
+        h2{
+            text-align: center;
+            color: #d1c197;
+            padding: 20px;
+        }
+        label{
+            color: #0a0a0a;
+            font-size: 17px;
+        }
+        #Uname{
+            width: 300px;
+            height: 30px;
+            border: none;
+            border-radius: 3px;
+            padding-left: 8px;
+        }
+        #Pass{
+            width: 300px;
+            height: 30px;
+            border: none;
+            border-radius: 3px;
+            padding-left: 8px;
+
+        }
+        #log{
+            width: 300px;
+            height: 30px;
+            border: none;
+            border-radius: 17px;
+            padding-left: 7px;
+            color: blue;
+        }
+        span{
+            color: white;
+            font-size: 17px;
+        }
+        a{
+            float: right;
+            background-color: grey;
+        }
+    </style>
+</body>
+</html>
